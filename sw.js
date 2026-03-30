@@ -4,7 +4,16 @@ self.addEventListener('push', function(event) {
     const options = {
         body: data.body || 'Новое уведомление',
         icon: 'https://bazhane.com.ua/apple-touch-icon.png',
-        // ВАЖНО: сохраняем URL во внутренние данные уведомления
+        actions: [
+        {
+            action: 'open_url', // Идентификатор действия
+            title: 'Перейти' // Текст на кнопке
+        },
+        {
+            action: 'close',
+            title: 'Закрыть'
+        }
+    ],
         data: {
             url: data.data ? data.data.url : 'https://bazhane.com.ua/'
         }
