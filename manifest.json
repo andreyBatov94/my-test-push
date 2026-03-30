@@ -7,9 +7,9 @@
   "description": "Тест пуш уведомлений",
   "icons": [
     {
-      "src": "https://bazhane.com.ua/favicon.svg",
+      "src": "https://bazhane.com.ua/apple-touch-icon.png",
       "sizes": "192x192",
-      "type": "image/svg"
+      "type": "image/png"
     }
   ]
 }
