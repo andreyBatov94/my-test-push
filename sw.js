@@ -1,21 +1,34 @@
+// Принудительное обновление Service Worker
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+    event.waitUntil(clients.claim());
+});
+
+// 1. Обработка входящего PUSH
 self.addEventListener('push', function(event) {
     const data = event.data ? event.data.json() : {};
     
     const options = {
-        body: data.body || 'Новое уведомление',
+        body: data.body || 'У нас есть что-то новое для вас!',
         icon: 'https://bazhane.com.ua/apple-touch-icon.png',
+        badge: 'https://bazhane.com.ua/apple-touch-icon.png', // Маленькая иконка для статус-бара
+        // Кнопки действий
         actions: [
-        {
-            action: 'open_url', // Идентификатор действия
-            title: 'Перейти' // Текст на кнопке
-        },
-        {
-            action: 'close',
-            title: 'Закрыть'
-        }
-    ],
+            {
+                action: 'open_url',
+                title: 'Перейти'
+            },
+            {
+                action: 'close',
+                title: 'Закрыть'
+            }
+        ],
+        // Метаданные (невидимые для юзера)
         data: {
-            url: data.data ? data.data.url : 'https://bazhane.com.ua/'
+            url: (data.data && data.data.url) ? data.data.url : 'https://bazhane.com.ua/'
         }
     };
 
@@ -24,24 +37,29 @@ self.addEventListener('push', function(event) {
     );
 });
 
-// ЭТОТ БЛОК ОТВЕЧАЕТ ЗА ОТКРЫТИЕ ССЫЛКИ
+// 2. Обработка КЛИКА по уведомлению или кнопкам
 self.addEventListener('notificationclick', function(event) {
-    // Закрываем уведомление на экране
+    // Всегда закрываем уведомление после клика
     event.notification.close();
 
-    // Достаем URL, который мы сохранили выше
+    // Если нажата кнопка "Закрыть", просто выходим из функции
+    if (event.action === 'close') {
+        return;
+    }
+
+    // В остальных случаях (клик на "Перейти" или на само тело пуша) — открываем ссылку
     const targetUrl = event.notification.data.url;
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
-            // Если вкладка уже открыта, просто переключаемся на нее
+            // Проверяем, не открыт ли уже этот URL
             for (var i = 0; i < windowClients.length; i++) {
                 var client = windowClients[i];
                 if (client.url === targetUrl && 'focus' in client) {
                     return client.focus();
                 }
             }
-            // Если вкладок нет — открываем новую
+            // Если вкладка не найдена — открываем новую
             if (clients.openWindow) {
                 return clients.openWindow(targetUrl);
             }
