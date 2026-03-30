@@ -1,15 +1,15 @@
 {
-  "name": "Push Test App",
-  "short_name": "PushApp",
+  "name": "Bazhane App",
+  "short_name": "Bazhane App",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
   "description": "Тест пуш уведомлений",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192",
+      "src": "https://bazhane.com.ua/favicon.svg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/svg"
     }
   ]
 }
