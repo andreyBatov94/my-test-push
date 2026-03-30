@@ -1,0 +1,15 @@
+{
+  "name": "Push Test App",
+  "short_name": "PushApp",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "description": "Тест пуш уведомлений",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
