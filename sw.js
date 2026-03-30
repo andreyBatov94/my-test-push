@@ -1,33 +1,41 @@
-self.addEventListener('install', (event) => {
-    self.skipWaiting(); // Принудительно активируем новый SW
-});
-
-self.addEventListener('activate', (event) => {
-    event.waitUntil(clients.claim()); // Берем управление страницами сразу
-});
-
 self.addEventListener('push', function(event) {
-    // Получаем данные из payload, который прислал send.js
-    const data = event.data ? event.data.json() : { title: 'Bazhane', body: 'Default message' };
+    const data = event.data ? event.data.json() : {};
     
     const options = {
-        body: data.body,
+        body: data.body || 'Новое уведомление',
         icon: 'https://bazhane.com.ua/apple-touch-icon.png',
-        badge: 'https://bazhane.com.ua/apple-touch-icon.png',
+        // ВАЖНО: сохраняем URL во внутренние данные уведомления
         data: {
             url: data.data ? data.data.url : 'https://bazhane.com.ua/'
         }
     };
 
     event.waitUntil(
-        self.registration.showNotification(data.title, options)
+        self.registration.showNotification(data.title || 'Bazhane', options)
     );
 });
 
-// Обработка клика (чтобы ссылка открывалась)
+// ЭТОТ БЛОК ОТВЕЧАЕТ ЗА ОТКРЫТИЕ ССЫЛКИ
 self.addEventListener('notificationclick', function(event) {
+    // Закрываем уведомление на экране
     event.notification.close();
+
+    // Достаем URL, который мы сохранили выше
+    const targetUrl = event.notification.data.url;
+
     event.waitUntil(
-        clients.openWindow(event.notification.data.url)
+        clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(windowClients) {
+            // Если вкладка уже открыта, просто переключаемся на нее
+            for (var i = 0; i < windowClients.length; i++) {
+                var client = windowClients[i];
+                if (client.url === targetUrl && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            // Если вкладок нет — открываем новую
+            if (clients.openWindow) {
+                return clients.openWindow(targetUrl);
+            }
+        })
     );
 });
